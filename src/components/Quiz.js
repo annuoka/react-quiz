@@ -1,28 +1,46 @@
 import Question from "./Question";
 import {useContext, useEffect} from "react";
 import {QuizContext} from "../contexts/quiz";
+import CategorySelect from "./CategorySelect";
+import {fetchQuestions} from "../helpers";
 
 
 const Quiz = () => {
     const [quizState, dispatch] = useContext(QuizContext);
     const quizLength = quizState.questions.length;
-    const apiUrl = 'https://opentdb.com/api.php?amount=10&category=27&difficulty=easy&type=multiple';
+    const categoriesUrl = 'https://opentdb.com/api_category.php';
 
     useEffect(() => {
-        if (quizState.error || quizState.questions.length > 0) {
+        if (quizState.error || quizState.categories.length > 0) {
             return;
         }
-        console.log('init');
-        fetch(apiUrl)
+        console.log('categories');
+        fetch(categoriesUrl)
             .then(response => response.json())
             .then(data => {
-                dispatch({type: 'SET_QUESTIONS', payload: data.results});
+                dispatch({type: 'SET_CATEGORIES', payload: data.trivia_categories});
             }).catch(error => {
                 dispatch({type: 'SERVER_ERROR', payload: error.message});
         });
     });
 
+    useEffect(() => {
+        if (quizState.error || quizState.questions.length > 0 || !quizState.currentCategory) {
+            return;
+        }
+        fetchQuestions(quizState.currentCategory)
+            .then(data => {
+                dispatch({type: 'SET_QUESTIONS', payload: data.results});
+            }).catch(error => {
+            dispatch({type: 'SERVER_ERROR', payload: error.message});
+
+        });
+    });
+
     return (<div className="quiz">
+        {!quizState.currentCategory && (<div className="category">
+                <CategorySelect />
+        </div>)}
 
         {quizState.error && (<div className="results">
 
@@ -51,7 +69,7 @@ const Quiz = () => {
             </div>
             <div className="next-button"
                  onClick={() => dispatch({type: 'RESTART'})}>
-                Restart Quiz
+                New Quiz
             </div>
         </div>)
         }

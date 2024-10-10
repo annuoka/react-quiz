@@ -6,10 +6,12 @@ const initialState = {
     currentQuestionIndex: 0,
     questions: [],
     showResults: false,
-    answers: [],//shuffleAnswers(questions[0]),
+    answers: [],
     selectedAnswer: '',
     correctAnswers: 0,
-    error: null
+    error: null,
+    categories: [],
+    currentCategory: null,
 };
 
 const reducer = (state, action) => {
@@ -45,6 +47,18 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 error: action.payload
+            };
+        case 'SET_CATEGORIES':
+            console.log('set categories', action.payload);
+            return {
+                ...state,
+                categories: action.payload
+            };
+        case 'SELECT_CATEGORY':
+            console.log('set category', action.payload);
+            return {
+                ...state,
+                currentCategory: action.payload
             };
         default:
             return state;

@@ -17,3 +17,8 @@ export const normalizeQuestions = (beQuestions) => {
         }
     })
 }
+
+export const fetchQuestions = (categoryId) => {
+    const apiUrl = `https://opentdb.com/api.php?amount=10&category=${categoryId}&difficulty=easy&type=multiple`;
+    return fetch(apiUrl).then(response => response.json())
+}
